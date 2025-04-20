@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id          Int          @id @default(autoincrement())
+  name        String
+  author      String
+  image       String
+  price       Int
+  qty         Int
+  description String
+  genres      String       @default("")
+  ebook       Boolean @default(false)
+  ordered     OrderBooks[]
+  eBook_users       Ebook[]
+}
+
+model Ebook{
+  id          Int          @id @default(autoincrement())
+  userid      Int 
+  bookid      Int         
+  book       Book          @relation(fields: [bookid], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  password String
+  email    String    @unique
+  admin    Boolean   @default(false)
+  address  Address[]
+  order    Order[]
+  sessions Session[]
+}
+
+model Address {
+  id       Int     @id @default(autoincrement())
+  user_id  Int
+  name     String
+  phone    String
+  state    String
+  city     String
+  pincode  Int
+  address  String
+  landmark String  @default("")
+  user     User    @relation(fields: [user_id], references: [id])
+  order    Order[]
+}
+
+model Session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+  Admin     Boolean
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id         Int          @id @default(autoincrement())
+  userId     Int
+  total      Int
+  address_id Int
+  date       DateTime     @default(now())
+  address    Address      @relation(fields: [address_id], references: [id], onDelete: Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderBooks OrderBooks[]
+}
+
+model OrderBooks {
+  id       Int    @id @default(autoincrement())
+  book_id  Int
+  order_id Int
+  cost     Int
+  qty      Int
+  status   String @default("Pending")
+  book     Book   @relation(fields: [book_id], references: [id], onDelete: Cascade)
+  order    Order  @relation(fields: [order_id], references: [id], onDelete: Cascade)
+}
+
+model Record {
+  id    String @id
+  total Int    @default(0)
+}
+
+model Record_Genres {
+  id    String
+  name  String
+  total Int    @default(0)
+
+  @@id([id, name])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model books {
+  name        String?
+  author      String?
+  genres      String?
+  description String?
+  price       BigInt?
+  qty         BigInt?
+  image       String?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model book {
+  name        String?
+  description String?
+
+  @@ignore
+}
