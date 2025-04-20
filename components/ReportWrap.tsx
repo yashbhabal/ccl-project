@@ -21,7 +21,7 @@ export default function ReportWrap({data,genres}:{data: {
     function handleChange(e:ChangeEvent<HTMLFormElement>){
       const data = new FormData(e.currentTarget);
         if(data.get("year")?.toString().length != 4)
-          return;
+          return;  
         if(year != parseInt(data.get('year') as string)){
           setYear(parseInt(data.get('year') as string))
           SetQuery([router,params,searchParam],{"year":`${data.get("year")}`})
